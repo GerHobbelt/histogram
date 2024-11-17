@@ -44,7 +44,7 @@ public:
   bool contains(const char* s) {
     const std::size_t n = std::strlen(s);
     if (size_ < n) return false;
-    return std::strstr(data_, s);
+    return (std::strstr(data_, s) != nullptr);
   }
 
   operator bool() { return size_ > 0; }
