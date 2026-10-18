@@ -171,8 +171,9 @@ struct map_impl : T {
       if (it != static_cast<T*>(map)->end()) {
         it->second += u;
       } else {
-        auto pair = map->emplace(idx, value_type{});
-        pair.first->second += u;
+        value_type tmp{};
+        tmp += u;
+        if (!(tmp == value_type{})) map->emplace(idx, tmp);
       }
       return *this;
     }
@@ -184,8 +185,9 @@ struct map_impl : T {
       if (it != static_cast<T*>(map)->end()) {
         it->second -= u;
       } else {
-        auto pair = map->emplace(idx, value_type{});
-        pair.first->second -= u;
+        value_type tmp{};
+        tmp -= u;
+        if (!(tmp == value_type{})) map->emplace(idx, tmp);
       }
       return *this;
     }
@@ -329,6 +331,10 @@ struct map_impl : T {
   const_iterator end() const noexcept { return {this, size_}; }
 
   std::size_t size() const noexcept { return size_; }
+
+  // access to the underlying map with only the non-empty cells,
+  // allows histogram operations to skip empty cells
+  const T& node_access() const noexcept { return *this; }
 
   template <class Archive>
   void serialize(Archive& ar, unsigned /* version */) {
